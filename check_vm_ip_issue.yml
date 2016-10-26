@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Check env vars
+      check_env_vars:
+    - name: Get VM details
+      get_vm_details: vm_id="{{ vm_id }}"
+      register: vm_details
+    - name: Check vm details
+      debug: msg="{{ vm_details }}"
+    - name: Get network details
+      get_net_details: net_name="{{ vm_details.meta.network_name }}"
+      register: net_details
+    - name: Check net details
+      debug: msg="{{ net_details }}"
+- hosts: network_nodes
+  tasks:
+    - name: Check net nodes
+      check_dhcp_namespace: net_id="{{ hostvars['localhost']['net_details']['meta']['network_id'] }}"
+      when: inventory_hostname in "{{ hostvars['localhost']['net_details']['meta']['network_nodes'] }}"
+
+- hosts: compute_nodes
+  tasks:
+    - name: Get VM details on the compute
+      get_compute_net_details: vm_id="{{ vm_id }}" net_details="{{ hostvars.localhost.net_details.meta }}"
+      when: inventory_hostname in "{{ hostvars['localhost']['vm_details']['meta']['hypervisor_hostname'] }}"
+      register: compute_vm_net_details
+    - name: debug compute details
+      debug: msg={{ compute_vm_net_details.meta.tap_interface }}
+    - name: Check compute firewall rules
+      check_compute_firewall_rules: tap_iface="{{ compute_vm_net_details.meta.tap_interface }}" 

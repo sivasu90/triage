@@ -1,0 +1,7 @@
+[network_nodes]
+helion-cp1-c1-m1-mgmt
+helion-cp1-c1-m2-mgmt
+helion-cp1-c1-m3-mgmt
+
+[compute_nodes]
+helion-cp1-comp0001-mgmt
