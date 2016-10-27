@@ -22,10 +22,11 @@ def check_net_namespace(module):
     if 'br-int' not in ovs_bridges:
         module.fail_json(msg={"ConfigError":"br-int not found in ovs bridges on the compute"})
     net_details = ast.literal_eval(module.params["net_details"])
+    '''
     if net_details['network_type'] in ['vxlan', 'gre']:
         if 'tun' not in ovs_bridges:
             module.fail_json(msg={"ConfigError":"Tunnel bridge not found in ovs bridges on the compute"})
-    
+    '''
     cmd = '''sudo grep -i tap /var/lib/nova/instances/{}/libvirt.xml|cut -d '"' -f2'''.format(vm_id)
     rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True)
     if rc != 0:

@@ -3,7 +3,7 @@
 from ansible.module_utils.basic import *
 import os
 
-def run_and_validate_output(cmd, error_msg="Something went wrong"):
+def run_and_validate_output(module, cmd, error_msg="Something went wrong"):
     rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True)
     if rc != 0:
         module.fail_json(msg={"rc":rc, "error": error_msg, "stderr": stderr})
@@ -13,9 +13,9 @@ def check_firewall_rules(module):
     tap_iface = module.params["tap_iface"]
     iface_id = tap_iface.split('-')[0].split('tap')[1]
     cmd = 'sudo iptables -S|grep {}|grep "sport 68"|grep "dport 67"|grep RETURN'.format(iface_id)
-    stdout = run_and_validate_output(cmd, error_msg="Missing dhcp firewall rules on the compute node")
+    stdout = run_and_validate_output(module, cmd, error_msg="Missing dhcp firewall rules on the compute node")
     cmd = 'sudo iptables -S|grep {}|grep "sport 67"|grep "dport 68"|grep DROP'.format(iface_id)
-    stdout = run_and_validate_output(cmd, error_msg="Missing dhcp firewall rules on the compute node"
+    stdout = run_and_validate_output(module, cmd, error_msg="Missing dhcp firewall rules on the compute node")
     module.exit_json(changed=False)
 
 def main():
